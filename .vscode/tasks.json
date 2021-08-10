@@ -15,9 +15,9 @@
             "problemMatcher": []
         },
         {
-            "label": "buildcpp",
+            "label": "buildc",
             "command": "g++",
-            "args": ["-g", "-o", "build/maincpp.exe", "src/main.cpp"],
+            "args": ["-g", "-o", "build/mainc.exe", "src/main.c"],
             "group": "build",
             "problemMatcher": []
         }

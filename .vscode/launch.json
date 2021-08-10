@@ -13,10 +13,10 @@
             "console": "externalTerminal"
         },
         {
-            "name": "CPP",
+            "name": "C",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/maincpp.exe",
+            "program": "${workspaceFolder}/build/mainc.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
