@@ -5,13 +5,20 @@
     "echoCommand": true,
     "tasks": [
         {
-            "label": "build",
+            "label": "buildcuda",
             "command": "nvcc",
             "args": ["-g", "-o", "build/main.exe", "src/main.cu"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
+            "problemMatcher": []
+        },
+        {
+            "label": "buildcpp",
+            "command": "g++",
+            "args": ["-g", "-o", "build/maincpp.exe", "src/main.cpp"],
+            "group": "build",
             "problemMatcher": []
         }
     ]
