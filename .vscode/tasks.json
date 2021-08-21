@@ -8,16 +8,13 @@
             "label": "buildcuda",
             "command": "nvcc",
             "args": ["-g", "-o", "build/main.exe", "src/main.cu"],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": []
         },
         {
             "label": "buildc",
             "command": "g++",
-            "args": ["-g", "-o", "build/mainc.exe", "src/main.c"],
+            "args": ["-g", "-o", "build/mainc.exe", "src/main.c", "src/include/game.c"],
             "group": "build",
             "problemMatcher": []
         }

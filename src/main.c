@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include "include/game.h"
 
 int main () {
-    printf("Hello World!\n");
+    int** board = newGame();
+    printBoard(board);
+    destroyBoard(board);
     return 0;
 }
