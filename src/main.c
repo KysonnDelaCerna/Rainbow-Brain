@@ -3,7 +3,13 @@
 
 int main () {
     int** board = newGame();
-    printBoard(board);
+
+    while (!isGameOver(board))
+    {
+        printBoard(board);
+        getInput(board);
+    }
+
     destroyBoard(board);
     return 0;
 }

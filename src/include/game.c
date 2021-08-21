@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include "game.h"
 
+int verifyMove(int** board, char* move)
+{
+    return 1;
+}
+
 int isGameOver(int** board)
 {
     int i, j, whites = 0, blacks = 0;
@@ -18,6 +23,22 @@ int isGameOver(int** board)
     if (whites && blacks)
         return 0;
     return 1;
+}
+
+int evaluateBoard(int** board)
+{
+    int score = 0, i, j;
+
+    for (i = 0; i < ROWS; i++)
+        for (j = 0; j < COLS; j++)
+            score += board[i][j];
+
+    return score;
+}
+
+int passTurn(int turn)
+{
+    return !turn;
 }
 
 int** newGame()
@@ -40,6 +61,11 @@ int** newGame()
         }
 
     return board;
+}
+
+void applyMove(int** board, char* move)
+{
+
 }
 
 void printBoard(int** board)
@@ -122,16 +148,6 @@ void printBoard(int** board)
         printf("%s\n", buffer[i]);
 }
 
-void passTurn()
-{
-    
-}
-
-void getInput()
-{
-
-}
-
 void destroyBoard(int** board)
 {
     int i;
@@ -140,4 +156,15 @@ void destroyBoard(int** board)
         free(board[i]);
     
     free(board);
+}
+
+void getInput(int** board)
+{
+    char move[52];
+
+    do
+        fgets(move, 52, stdin);
+    while (!verifyMove(board, move));
+    
+    applyMove(board, move);
 }
