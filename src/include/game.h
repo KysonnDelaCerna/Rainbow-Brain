@@ -4,13 +4,12 @@
 #define ROWS 8
 #define COLS 8
 
-int verifyMove(int**, char*);
+int applyMove(int[][COLS], char*);
 int isGameOver(int**);
 int evaluateBoard(int**);
-int passTurn(int);
+int getInput(int**);
 int** newGame();
-void applyMove(int**, char*);
 void printBoard(int**);
 void destroyBoard(int**);
-void getInput(int**);
+void waitKey();
 #endif
