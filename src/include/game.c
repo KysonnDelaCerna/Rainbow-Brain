@@ -185,7 +185,7 @@ int** newGame()
             if (i < 3 && (i + j) % 2 == 0)
                 board[i][j] = -1;
             else if (i > 4 && (i + j) % 2 == 0)
-                board[i][j] = 5;
+                board[i][j] = 1;
             else
                 board[i][j] = 0;
         }
