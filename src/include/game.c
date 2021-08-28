@@ -3,17 +3,9 @@
 #include <string.h>
 #include "game.h"
 
-int applyMove(int board[][COLS], char* move)
+int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
 {
-    if (move[0] < 'A' || move[0] > 'H' || move[1] < '1' || move[1] > '8' ||
-        move[2] < 'A' || move[2] > 'H' || move[3] < '1' || move[3] > '8')
-        return -1;
-
-    int srcX, srcY, dstX, dstY, moveX, moveY;
-    srcX = move[1] - '1';
-    srcY = move[0] - 'A';
-    dstX = move[3] - '1';
-    dstY = move[2] - 'A';
+    int moveX, moveY;
     moveX = srcX - dstX;
     moveY = srcY - dstY;
 
@@ -84,6 +76,21 @@ int applyMove(int board[][COLS], char* move)
     return 0;
 }
 
+int parseAndApplyMove(int board[][COLS], char* move)
+{
+    if (move[0] < 'A' || move[0] > 'H' || move[1] < '1' || move[1] > '8' ||
+        move[2] < 'A' || move[2] > 'H' || move[3] < '1' || move[3] > '8')
+        return -1;
+
+    int srcX, srcY, dstX, dstY;
+    srcX = move[1] - '1';
+    srcY = move[0] - 'A';
+    dstX = move[3] - '1';
+    dstY = move[2] - 'A';
+
+    return applyMove(board, srcX, srcY, dstX, dstY);
+}
+
 int isGameOver(int** board)
 {
     int i, j, whites = 0, blacks = 0;
@@ -149,7 +156,7 @@ int getInput(int** board)
     while (strlen(move + pointer) >= 4 && !turnEnded)
     {
         strncpy(tempMove, move + pointer, 4);
-        switch (applyMove(tempBoard, tempMove))
+        switch (parseAndApplyMove(tempBoard, tempMove))
         {
             case 0:
             {
