@@ -3,7 +3,7 @@
 #include <string.h>
 #include "game.h"
 
-int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
+int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int hasEaten)
 {
     if (srcX < 0 || srcX > COLS - 1 || srcY < 0 || srcY > ROWS - 1 ||
         dstX < 0 || dstX > COLS - 1 || dstY < 0 || dstY > ROWS - 1)
@@ -17,7 +17,7 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
     if (abs(board[srcY][srcX]) == 1)
     {
         /* moving */
-        if (moveY == board[srcY][srcX] && abs(moveX) == 1)
+        if (moveY == board[srcY][srcX] && abs(moveX) == 1 && !hasEaten)
         {
             if (board[dstY][dstX] == 0)
             {
@@ -70,6 +70,8 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
                 board[srcY + (moveY < 0 ? moveY + 1 : moveY - 1)][srcX + (moveX < 0 ? moveX + 1 : moveX - 1)] = 0;
                 return 1;
             }
+            else if (hasEaten)
+                return -3;
             else
                 return 0;
         }
@@ -82,7 +84,7 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
     return 0;
 }
 
-int parseAndApplyMove(int board[][COLS], char* move)
+int parseAndApplyMove(int board[][COLS], char* move, int hasEaten)
 {
     int srcX, srcY, dstX, dstY;
     srcX = move[1] - '1';
@@ -90,7 +92,7 @@ int parseAndApplyMove(int board[][COLS], char* move)
     dstX = move[3] - '1';
     dstY = move[2] - 'A';
 
-    return applyMove(board, srcX, srcY, dstX, dstY);
+    return applyMove(board, srcX, srcY, dstX, dstY, hasEaten);
 }
 
 int isGameOver(int** board)
@@ -138,7 +140,7 @@ int evaluateBoard(int** board)
 
 int getInput(int** board)
 {
-    int pointer = 0, i, j, turnEnded = 0;
+    int pointer = 0, i, j, turnEnded = 0, hasEaten = 0;
     int tempBoard[ROWS][COLS];
     char move[55], tempMove[6];
 
@@ -156,11 +158,16 @@ int getInput(int** board)
     while (strlen(move + pointer) >= 4 && !turnEnded)
     {
         strncpy(tempMove, move + pointer, 4);
-        switch (parseAndApplyMove(tempBoard, tempMove))
+        switch (parseAndApplyMove(tempBoard, tempMove, hasEaten))
         {
             case 0:
             {
                 turnEnded = 1;
+                break;
+            }
+            case 1:
+            {
+                hasEaten = 1;
                 break;
             }
             case -1:

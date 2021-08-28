@@ -5,8 +5,8 @@
 #define COLS 8
 #define INF 1000000000
 
-int applyMove(int[][COLS], int, int, int, int);
-int parseAndApplyMove(int[][COLS], char*);
+int applyMove(int[][COLS], int, int, int, int, int);
+int parseAndApplyMove(int[][COLS], char*, int);
 int isGameOver(int**);
 int evaluateBoard(int**);
 int getInput(int**);
