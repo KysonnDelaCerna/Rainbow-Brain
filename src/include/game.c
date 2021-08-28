@@ -99,17 +99,29 @@ int isGameOver(int** board)
     
     if (whites && blacks)
         return 0;
-    return 1;
+    else if (whites)
+        return 1;
+    else if (blacks)
+        return 2;
 }
 
 int evaluateBoard(int** board)
 {
-    int score = 0, i, j;
+    int positiveScore = 0, negativeScore = 0, i, j;
 
     for (i = 0; i < ROWS; i++)
         for (j = 0; j < COLS; j++)
-            score += board[i][j];
+        {
+            if (board[i][j] > 0)
+                positiveScore += board[i][j];
+            else if (board[i][j] < 0)
+                negativeScore += board[i][j];
+        }
 
+    if (positiveScore == 0)
+        return -1000000;
+    else if (negativeScore == 0)
+        return 1000000;
     return score;
 }
 
