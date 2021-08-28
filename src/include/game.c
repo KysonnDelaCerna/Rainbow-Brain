@@ -5,6 +5,10 @@
 
 int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
 {
+    if (srcX < 0 || srcX > COLS - 1 || srcY < 0 || srcY > ROWS - 1 ||
+        dstX < 0 || dstX > COLS - 1 || dstY < 0 || dstY > ROWS - 1)
+        return -1;
+
     int moveX, moveY;
     moveX = srcX - dstX;
     moveY = srcY - dstY;
@@ -80,10 +84,6 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
 
 int parseAndApplyMove(int board[][COLS], char* move)
 {
-    if (move[0] < 'A' || move[0] > 'H' || move[1] < '1' || move[1] > '8' ||
-        move[2] < 'A' || move[2] > 'H' || move[3] < '1' || move[3] > '8')
-        return -1;
-
     int srcX, srcY, dstX, dstY;
     srcX = move[1] - '1';
     srcY = move[0] - 'A';
