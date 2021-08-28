@@ -103,6 +103,8 @@ int isGameOver(int** board)
         return 1;
     else if (blacks)
         return 2;
+    
+    return 0;
 }
 
 int evaluateBoard(int** board)
@@ -119,10 +121,10 @@ int evaluateBoard(int** board)
         }
 
     if (positiveScore == 0)
-        return -1000000;
+        return -INF;
     else if (negativeScore == 0)
-        return 1000000;
-    return score;
+        return INF;
+    return positiveScore + negativeScore;
 }
 
 int getInput(int** board)

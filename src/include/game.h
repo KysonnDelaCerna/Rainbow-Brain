@@ -3,6 +3,7 @@
 
 #define ROWS 8
 #define COLS 8
+#define INF 1000000000
 
 int applyMove(int[][COLS], char*);
 int isGameOver(int**);
