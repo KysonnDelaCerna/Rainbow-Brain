@@ -149,9 +149,7 @@ int getInput(int** board)
         return 0;
     }
 
-    for (i = 0; i < ROWS; i++)
-        for (j = 0; j < COLS; j++)
-            tempBoard[i][j] = board[i][j];
+    deepCopy(board, tempBoard);
 
     while (strlen(move + pointer) >= 4 && !turnEnded)
     {
@@ -186,9 +184,7 @@ int getInput(int** board)
         pointer += 2;
     }
 
-    for (i = 0; i < ROWS; i++)
-        for (j = 0; j < COLS; j++)
-            board[i][j] = tempBoard[i][j];
+    deepCopy(tempBoard, board);
     return 1;
 }
 
@@ -212,6 +208,24 @@ int** newGame()
         }
 
     return board;
+}
+
+void deepCopy(int** src, int dst[][COLS])
+{
+    int i, j;
+
+    for (i = 0; i < ROWS; i++)
+        for(j = 0; j < COLS; j++)
+            dst[i][j] = src[i][j];
+}
+
+void deepCopy(int src[][COLS], int** dst)
+{
+    int i, j;
+
+    for (i = 0; i < ROWS; i++)
+        for(j = 0; j < COLS; j++)
+            dst[i][j] = src[i][j];
 }
 
 void printBoard(int** board)

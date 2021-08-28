@@ -11,6 +11,8 @@ int isGameOver(int**);
 int evaluateBoard(int**);
 int getInput(int**);
 int** newGame();
+void deepCopy(int**, int[][COLS]);
+void deepCopy(int[][COLS], int**);
 void printBoard(int**);
 void destroyBoard(int**);
 void waitKey();
