@@ -9,32 +9,33 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
     moveX = srcX - dstX;
     moveY = srcY - dstY;
 
-    if (board[srcY][srcX] == 1)
+    /* normal piece */
+    if (abs(board[srcY][srcX]) == 1)
     {
         /* moving */
-        if (moveY == 1 && abs(moveX) == 1)
+        if (moveY == board[srcY][srcX] && abs(moveX) == 1)
         {
             if (board[dstY][dstX] == 0)
             {
-                if (dstY == ROWS - 1)
-                    board[dstY][dstX] = 5;
+                if (dstY == ROWS - 1 || dstY == 0)
+                    board[dstY][dstX] = 5 * board[srcY][srcX];
                 else
-                    board[dstY][dstX] = 1;
+                    board[dstY][dstX] = board[srcY][srcX];
                 board[srcY][srcX] = 0;
             }
             else
                 return -3;
         }
         /* eating */
-        else if (moveY == 2 && abs(moveX) == 2)
+        else if (moveY == 2 * board[srcY][srcX] && abs(moveX) == 2)
         {
             if (board[dstY][dstX] == 0 &&
-                board[(srcY + dstY) / 2][(srcX + dstX) / 2] < 0)
+                (board[(srcY + dstY) / 2][(srcX + dstX) / 2] < 0) != (board[srcY][srcX] < 0))
             {
-                if (dstY == ROWS - 1)
-                    board[dstY][dstX] = 5;
+                if (dstY == ROWS - 1 || dstY == 0)
+                    board[dstY][dstX] = 5 * board[srcY][srcX];
                 else
-                    board[dstY][dstX] = 1;
+                    board[dstY][dstX] = board[srcY][srcX];
                 board[(srcY + dstY) / 2][(srcX + dstX) / 2] = 0;
                 board[srcY][srcX] = 0;
                 return 1;
@@ -45,7 +46,8 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
         else
             return -3;
     }
-    else if (board[srcY][srcX] == 5)
+    /* king piece */
+    else if (abs(board[srcY][srcX]) == 5)
     {
         if (abs(moveX) == abs(moveY) && moveX != 0)
         {
@@ -56,10 +58,10 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY)
             
             /* moving */
             board[srcY][srcX] = 0;
-            board[dstY][dstX] = 5;
+            board[dstY][dstX] = board[srcY][srcX];
 
             /* eating */
-            if (board[srcY + (moveY < 0 ? moveY + 1 : moveY - 1)][srcX + (moveX < 0 ? moveX + 1 : moveX - 1)] < 0)
+            if ((board[srcY + (moveY < 0 ? moveY + 1 : moveY - 1)][srcX + (moveX < 0 ? moveX + 1 : moveX - 1)]) < 0 != (board[srcY][srcX] < 0))
             {
                 board[srcY + (moveY < 0 ? moveY + 1 : moveY - 1)][srcX + (moveX < 0 ? moveX + 1 : moveX - 1)] = 0;
                 return 1;
