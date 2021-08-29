@@ -2,8 +2,10 @@
 #include "include/game.h"
 
 int main() {
-    int** board = newGame();
+    int board[ROWS][COLS];
     int turn = 1;
+
+    newGame(board);
 
     while (!isGameOver(board))
     {
@@ -12,6 +14,5 @@ int main() {
             turn = (turn == 1 ? -1 : 1);
     }
 
-    destroyBoard(board);
     return 0;
 }

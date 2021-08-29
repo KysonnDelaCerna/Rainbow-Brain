@@ -3,7 +3,7 @@
 #include <string.h>
 #include "game.h"
 
-int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int hasEaten, int turn)
+int applyMove(int board[ROWS][COLS], int srcX, int srcY, int dstX, int dstY, int hasEaten, int turn)
 {
     if (srcX < 0 || srcX > COLS - 1 || srcY < 0 || srcY > ROWS - 1 ||
         dstX < 0 || dstX > COLS - 1 || dstY < 0 || dstY > ROWS - 1)
@@ -85,7 +85,7 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int has
     return 0;
 }
 
-int parseAndApplyMove(int board[][COLS], char* move, int hasEaten, int turn)
+int parseAndApplyMove(int board[ROWS][COLS], char* move, int hasEaten, int turn)
 {
     int srcX, srcY, dstX, dstY;
     srcX = move[1] - '1';
@@ -96,7 +96,7 @@ int parseAndApplyMove(int board[][COLS], char* move, int hasEaten, int turn)
     return applyMove(board, srcX, srcY, dstX, dstY, hasEaten, turn);
 }
 
-int getInput(int** board, int turn)
+int getInput(int board[ROWS][COLS], int turn)
 {
     int pointer = 0, i, j, turnEnded = 0, hasEaten = 0;
     int tempBoard[ROWS][COLS];
@@ -111,7 +111,7 @@ int getInput(int** board, int turn)
         return 0;
     }
 
-    deepCopy(board, tempBoard);
+    memcpy(tempBoard, board, sizeof(int) * ROWS * COLS);
 
     while (strlen(move + pointer) >= 4 && !turnEnded)
     {
@@ -151,11 +151,11 @@ int getInput(int** board, int turn)
         pointer += 2;
     }
 
-    deepCopy(tempBoard, board);
+    memcpy(board, tempBoard, sizeof(int) * ROWS * COLS);
     return 1;
 }
 
-int isGameOver(int** board)
+int isGameOver(int board[ROWS][COLS])
 {
     int i, j, whites = 0, blacks = 0;
 
@@ -178,7 +178,7 @@ int isGameOver(int** board)
     return 0;
 }
 
-int evaluateBoard(int** board)
+int evaluateBoard(int board[ROWS][COLS])
 {
     int positiveScore = 0, negativeScore = 0, i, j;
 
@@ -198,47 +198,7 @@ int evaluateBoard(int** board)
     return positiveScore + negativeScore;
 }
 
-int** newGame()
-{
-    int** board = (int**) malloc(sizeof(int*) * ROWS);
-    int i, j;
-
-    for (i = 0; i < ROWS; i++)
-        board[i] = (int*) malloc(sizeof(int) * COLS);
-
-    for (i = 0; i < ROWS; i++)
-        for (j = 0; j < COLS; j++)
-        {
-            if (i < 3 && (i + j) % 2 == 0)
-                board[i][j] = -1;
-            else if (i > 4 && (i + j) % 2 == 0)
-                board[i][j] = 1;
-            else
-                board[i][j] = 0;
-        }
-
-    return board;
-}
-
-void deepCopy(int** src, int dst[][COLS])
-{
-    int i, j;
-
-    for (i = 0; i < ROWS; i++)
-        for(j = 0; j < COLS; j++)
-            dst[i][j] = src[i][j];
-}
-
-void deepCopy(int src[][COLS], int** dst)
-{
-    int i, j;
-
-    for (i = 0; i < ROWS; i++)
-        for(j = 0; j < COLS; j++)
-            dst[i][j] = src[i][j];
-}
-
-void printBoard(int** board)
+void printBoard(int board[ROWS][COLS])
 {
     char buffer[ROWS * 3 + 1][COLS * 5 + 4] = {
         "      1    2    3    4    5    6    7    8",
@@ -318,14 +278,20 @@ void printBoard(int** board)
         printf("%s\n", buffer[i]);
 }
 
-void destroyBoard(int** board)
+void newGame(int board[ROWS][COLS])
 {
-    int i;
+    int i, j;
 
     for (i = 0; i < ROWS; i++)
-        free(board[i]);
-    
-    free(board);
+        for (j = 0; j < COLS; j++)
+        {
+            if (i < 3 && (i + j) % 2 == 0)
+                board[i][j] = -1;
+            else if (i > 4 && (i + j) % 2 == 0)
+                board[i][j] = 1;
+            else
+                board[i][j] = 0;
+        }
 }
 
 void waitKey()
