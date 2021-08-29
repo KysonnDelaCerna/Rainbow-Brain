@@ -4,6 +4,8 @@
         "ios": "c",
         "type_traits": "c",
         "xstring": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "stdlib.h": "c",
+        "game.h": "c"
     }
 }
