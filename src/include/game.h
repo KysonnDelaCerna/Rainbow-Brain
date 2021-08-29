@@ -5,11 +5,11 @@
 #define COLS 8
 #define INF 1000000000
 
-int applyMove(int[][COLS], int, int, int, int, int);
-int parseAndApplyMove(int[][COLS], char*, int);
+int applyMove(int[][COLS], int, int, int, int, int, int);
+int parseAndApplyMove(int[][COLS], char*, int, int);
+int getInput(int**, int);
 int isGameOver(int**);
 int evaluateBoard(int**);
-int getInput(int**);
 int** newGame();
 void deepCopy(int**, int[][COLS]);
 void deepCopy(int[][COLS], int**);

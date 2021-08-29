@@ -3,7 +3,7 @@
 #include <string.h>
 #include "game.h"
 
-int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int hasEaten)
+int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int hasEaten, int turn)
 {
     if (srcX < 0 || srcX > COLS - 1 || srcY < 0 || srcY > ROWS - 1 ||
         dstX < 0 || dstX > COLS - 1 || dstY < 0 || dstY > ROWS - 1)
@@ -14,7 +14,7 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int has
     moveY = srcY - dstY;
 
     /* normal piece */
-    if (abs(board[srcY][srcX]) == 1)
+    if (board[srcY][srcX] == 1 * turn)
     {
         /* moving */
         if (moveY == board[srcY][srcX] && abs(moveX) == 1 && !hasEaten)
@@ -33,7 +33,7 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int has
         /* eating */
         else if (moveY == 2 * board[srcY][srcX] && abs(moveX) == 2)
         {
-            if (board[dstY][dstX] == 0 &&
+            if (board[dstY][dstX] == 0 && board[(srcY + dstY) / 2][(srcX + dstX) / 2] != 0 &&
                 (board[(srcY + dstY) / 2][(srcX + dstX) / 2] < 0) != (board[srcY][srcX] < 0))
             {
                 if (dstY == ROWS - 1 || dstY == 0)
@@ -51,23 +51,24 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int has
             return -3;
     }
     /* king piece */
-    else if (abs(board[srcY][srcX]) == 5)
+    else if (board[srcY][srcX] == 5 * turn)
     {
         if (abs(moveX) == abs(moveY) && moveX != 0)
         {
             int i;
             for (i = 1; i < abs(moveX) - 1; i++)
-                if (board[srcY + (moveY < 0 ? -i : i)][srcX + (moveX < 0 ? -i : i)] != 0)
+                if (board[srcY - (moveY < 0 ? -i : i)][srcX - (moveX < 0 ? -i : i)] != 0)
                     return -3;
-            
+
             /* moving */
-            board[srcY][srcX] = 0;
             board[dstY][dstX] = board[srcY][srcX];
+            board[srcY][srcX] = 0;
 
             /* eating */
-            if ((board[srcY + (moveY < 0 ? moveY + 1 : moveY - 1)][srcX + (moveX < 0 ? moveX + 1 : moveX - 1)]) < 0 != (board[srcY][srcX] < 0))
+            if (board[srcY - (moveY < 0 ? moveY + 1 : moveY - 1)][srcX - (moveX < 0 ? moveX + 1 : moveX - 1)] != 0 &&
+                ((board[srcY - (moveY < 0 ? moveY + 1 : moveY - 1)][srcX - (moveX < 0 ? moveX + 1 : moveX - 1)]) < 0) != (board[dstY][dstX] < 0))
             {
-                board[srcY + (moveY < 0 ? moveY + 1 : moveY - 1)][srcX + (moveX < 0 ? moveX + 1 : moveX - 1)] = 0;
+                board[srcY - (moveY < 0 ? moveY + 1 : moveY - 1)][srcX - (moveX < 0 ? moveX + 1 : moveX - 1)] = 0;
                 return 1;
             }
             else if (hasEaten)
@@ -84,7 +85,7 @@ int applyMove(int board[][COLS], int srcX, int srcY, int dstX, int dstY, int has
     return 0;
 }
 
-int parseAndApplyMove(int board[][COLS], char* move, int hasEaten)
+int parseAndApplyMove(int board[][COLS], char* move, int hasEaten, int turn)
 {
     int srcX, srcY, dstX, dstY;
     srcX = move[1] - '1';
@@ -92,7 +93,66 @@ int parseAndApplyMove(int board[][COLS], char* move, int hasEaten)
     dstX = move[3] - '1';
     dstY = move[2] - 'A';
 
-    return applyMove(board, srcX, srcY, dstX, dstY, hasEaten);
+    return applyMove(board, srcX, srcY, dstX, dstY, hasEaten, turn);
+}
+
+int getInput(int** board, int turn)
+{
+    int pointer = 0, i, j, turnEnded = 0, hasEaten = 0;
+    int tempBoard[ROWS][COLS];
+    char move[55], tempMove[6];
+
+    fgets(move, 52, stdin);
+
+    if (strlen(move) < 4)
+    {
+        printf("Input too short\n");
+        waitKey();
+        return 0;
+    }
+
+    deepCopy(board, tempBoard);
+
+    while (strlen(move + pointer) >= 4 && !turnEnded)
+    {
+        strncpy(tempMove, move + pointer, 4);
+        switch (parseAndApplyMove(tempBoard, tempMove, hasEaten, turn))
+        {
+            case 0:
+            {
+                turnEnded = 1;
+                break;
+            }
+            case 1:
+            {
+                hasEaten = 1;
+                break;
+            }
+            case -1:
+            {
+                printf("Invalid character\n");
+                waitKey();
+                return 0;
+            }
+            case -2:
+            {
+                printf("Invalid piece\n");
+                waitKey();
+                return 0;
+            }
+            case -3:
+            {
+                printf("Invalid move\n");
+                waitKey();
+                return 0;
+            }
+        }
+
+        pointer += 2;
+    }
+
+    deepCopy(tempBoard, board);
+    return 1;
 }
 
 int isGameOver(int** board)
@@ -136,65 +196,6 @@ int evaluateBoard(int** board)
     else if (negativeScore == 0)
         return INF;
     return positiveScore + negativeScore;
-}
-
-int getInput(int** board)
-{
-    int pointer = 0, i, j, turnEnded = 0, hasEaten = 0;
-    int tempBoard[ROWS][COLS];
-    char move[55], tempMove[6];
-
-    fgets(move, 52, stdin);
-
-    if (strlen(move) < 4)
-    {
-        printf("Input too short\n");
-        waitKey();
-        return 0;
-    }
-
-    deepCopy(board, tempBoard);
-
-    while (strlen(move + pointer) >= 4 && !turnEnded)
-    {
-        strncpy(tempMove, move + pointer, 4);
-        switch (parseAndApplyMove(tempBoard, tempMove, hasEaten))
-        {
-            case 0:
-            {
-                turnEnded = 1;
-                break;
-            }
-            case 1:
-            {
-                hasEaten = 1;
-                break;
-            }
-            case -1:
-            {
-                printf("Invalid character\n");
-                waitKey();
-                return 0;
-            }
-            case -2:
-            {
-                printf("Invalid piece\n");
-                waitKey();
-                return 0;
-            }
-            case -3:
-            {
-                printf("Invalid move\n");
-                waitKey();
-                return 0;
-            }
-        }
-
-        pointer += 2;
-    }
-
-    deepCopy(tempBoard, board);
-    return 1;
 }
 
 int** newGame()
@@ -329,6 +330,6 @@ void destroyBoard(int** board)
 
 void waitKey()
 {
-    printf("Press any key to continue...\n");
+    printf("Press enter to continue...\n");
     getchar();
 }
