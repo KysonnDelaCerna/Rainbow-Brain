@@ -6,6 +6,7 @@
         "xstring": "c",
         "xutility": "c",
         "stdlib.h": "c",
-        "game.h": "c"
+        "game.h": "c",
+        "cstdlib": "c"
     }
 }

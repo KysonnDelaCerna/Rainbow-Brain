@@ -10,8 +10,8 @@ int applyMove(int board[ROWS][COLS], int srcX, int srcY, int dstX, int dstY, int
         return -1;
 
     int moveX, moveY;
-    moveX = srcX - dstX;
-    moveY = srcY - dstY;
+    moveX = dstX - srcX;
+    moveY = dstY - srcY;
 
     /* normal piece */
     if (board[srcY][srcX] == 1 * turn)
@@ -286,9 +286,9 @@ void newGame(int board[ROWS][COLS])
         for (j = 0; j < COLS; j++)
         {
             if (i < 3 && (i + j) % 2 == 0)
-                board[i][j] = -1;
-            else if (i > 4 && (i + j) % 2 == 0)
                 board[i][j] = 1;
+            else if (i > 4 && (i + j) % 2 == 0)
+                board[i][j] = -1;
             else
                 board[i][j] = 0;
         }
