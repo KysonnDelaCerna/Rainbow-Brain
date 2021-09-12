@@ -7,6 +7,8 @@
         "xutility": "c",
         "stdlib.h": "c",
         "game.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "iostream": "cpp",
+        "gameoflife.h": "c"
     }
 }
