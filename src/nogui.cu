@@ -3,6 +3,8 @@ extern "C" {
 #include "include/gameOfLife.h"
 }
 
+using namespace std;
+
 __device__ int mod(int a, int b)
 {
     return (a + b) % b;
@@ -47,33 +49,75 @@ __device__ char nextState(char slice[9])
     return DEAD;
 }
 
-__global__ void nextGeneration(char oldBoard[HEIGHT][WIDTH], char newBoard[HEIGHT][WIDTH])
+__global__ void nextGeneration(char *oldBoard, char *newBoard)
 {
-    int i, j;
-    char newBoard[HEIGHT][WIDTH], slice[9];
+    int i, x, y, left, right, up, down, stride = blockDim.x * gridDim.x;
+    char slice[9];
 
-    for (i = 0; i < HEIGHT; i++)
+    for (i = blockIdx.x * blockDim.x + threadIdx.x; i < WIDTH * HEIGHT; i += stride)
     {
-        for (j = 0; j < WIDTH; j++)
-        {
-            slice[0] = oldBoard[mod(i - 1, HEIGHT)][mod(j - 1, WIDTH)];
-            slice[1] = oldBoard[mod(i - 1, HEIGHT)][j];
-            slice[2] = oldBoard[mod(i - 1, HEIGHT)][mod(j + 1, WIDTH)];
-            slice[3] = oldBoard[i]                 [mod(j - 1, WIDTH)];
-            slice[4] = oldBoard[i]                 [j];
-            slice[5] = oldBoard[i]                 [mod(j + 1, WIDTH)];
-            slice[6] = oldBoard[mod(i + 1, HEIGHT)][mod(j - 1, WIDTH)];
-            slice[7] = oldBoard[mod(i + 1, HEIGHT)][j];
-            slice[8] = oldBoard[mod(i + 1, HEIGHT)][mod(j + 1, WIDTH)];
+        x = i % WIDTH;
+        y = i - x;
+        left = mod(x - 1, WIDTH);
+        right = mod(x + 1, WIDTH);
+        up = mod(y - WIDTH, WIDTH * HEIGHT);
+        down = mod(y + WIDTH, WIDTH * HEIGHT);
 
-            newBoard[i][j] = nextState(slice);
-        }
+        slice[0] = oldBoard[left + up];
+        slice[1] = oldBoard[x + up];
+        slice[2] = oldBoard[right + up];
+        slice[3] = oldBoard[left + y];
+        slice[4] = oldBoard[i];
+        slice[5] = oldBoard[right + y];
+        slice[6] = oldBoard[left + down];
+        slice[7] = oldBoard[x + down];
+        slice[8] = oldBoard[right + down];
+
+        newBoard[i] = nextState(slice);
     }
+}
 
-    memcpy(oldBoard, newBoard, sizeof(char) * WIDTH * HEIGHT);
+void printBoard(char *board) {
+    int i, j;
+
+    for (i = 0; i < 16; i++) {
+        for (j = 0; j < 16; j++) {
+            switch(board[i * WIDTH + j])
+            {
+                case RED_ALIVE: cout << "R"; break;
+                case RED_DYING: cout << "r"; break;
+                case GREEN_ALIVE: cout << "G"; break;
+                case GREEN_DYING: cout << "g"; break;
+                case BLUE_ALIVE: cout << "B"; break;
+                case BLUE_DYING: cout << "b"; break;
+                case DEAD: cout << " "; break;
+            }
+        }
+        cout << endl;
+    }
+    cout << endl;
 }
 
 int main (void) {
-    cout << "Hello World" << endl;
+    char *oldBoard, *newBoard;
+    cudaMallocManaged(&oldBoard, WIDTH * HEIGHT * sizeof(char));
+    cudaMallocManaged(&newBoard, WIDTH * HEIGHT * sizeof(char));
+
+    seedRandom();
+    initiateRandomBoardP(oldBoard);
+
+    printBoard(oldBoard);
+
+    int blockSize = 256;
+    int numBlocks = (WIDTH * HEIGHT + blockSize - 1) / blockSize;
+
+    nextGeneration<<<numBlocks, blockSize>>>(oldBoard, newBoard);
+    cudaDeviceSynchronize();
+
+    printBoard(newBoard);
+
+    cudaFree(oldBoard);
+    cudaFree(newBoard);
+
     return 0;
 }
