@@ -1,8 +1,8 @@
 #ifndef __GAME_OF_LIFE_H
 #define __GAME_OF_LIFE_H
 
-#define WIDTH 1000
-#define HEIGHT 1000
+#define WIDTH 10
+#define HEIGHT 10
 
 #define RED_ALIVE 6
 #define RED_DYING 5
@@ -12,7 +12,10 @@
 #define BLUE_DYING 1
 #define DEAD 0
 
-void initiateBoard(short int[WIDTH][HEIGHT]);
+int mod(int, int);
+char nextState(char[9]);
+void initiateBoard(char[HEIGHT][WIDTH]);
+void displayBoard(char[HEIGHT][WIDTH]);
 void seedRandom();
 
 #endif
