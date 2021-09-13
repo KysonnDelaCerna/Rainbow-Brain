@@ -1,4 +1,7 @@
 #include <iostream>
+extern "C" {
+#include "include/gameOfLife.h"
+}
 
 __device__ int mod(int a, int b)
 {

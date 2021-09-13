@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "gameOfLife.h"
 
-void initiateBoard(char board[HEIGHT][WIDTH])
+void initiateRandomBoard(char board[HEIGHT][WIDTH])
 {
     int i, j;
 
@@ -11,7 +11,7 @@ void initiateBoard(char board[HEIGHT][WIDTH])
     {
         for (j = 0; j < WIDTH; j++)
         {
-            switch(rand() % 6)
+            switch(rand() % 12)
             {
                 case 0:
                 {

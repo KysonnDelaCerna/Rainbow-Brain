@@ -1,8 +1,8 @@
 #ifndef __GAME_OF_LIFE_H
 #define __GAME_OF_LIFE_H
 
-#define WIDTH 32
-#define HEIGHT 32
+#define WIDTH 1024
+#define HEIGHT 1024
 
 #define RED_ALIVE 6
 #define RED_DYING 5
