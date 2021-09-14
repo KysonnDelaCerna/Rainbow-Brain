@@ -15,7 +15,6 @@
 #define DEAD 0
 
 void initiateRandomBoard(char[HEIGHT][WIDTH]);
-void initiateRandomBoardP(char *);
 void seedRandom();
 
 #endif

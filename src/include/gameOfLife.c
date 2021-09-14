@@ -37,37 +37,6 @@ void initiateRandomBoard(char board[HEIGHT][WIDTH])
     }
 }
 
-void initiateRandomBoardP(char *board)
-{
-    int i;
-
-    for (i = 0; i < WIDTH * HEIGHT; i++)
-    {
-        switch(rand() % 12)
-        {
-            case 0:
-            {
-                board[i] = RED_ALIVE;
-                break;
-            }
-            case 1:
-            {
-                board[i] = GREEN_ALIVE;
-                break;
-            }
-            case 2:
-            {
-                board[i] = BLUE_ALIVE;
-                break;
-            }
-            default:
-            {
-                board[i] = DEAD;
-            }
-        }
-    }
-}
-
 void seedRandom()
 {
     srand(time(NULL));

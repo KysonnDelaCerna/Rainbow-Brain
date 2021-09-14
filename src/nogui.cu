@@ -1,4 +1,6 @@
 #include <iostream>
+#include <curand.h>
+#include <curand_kernel.h>
 extern "C" {
 #include "include/gameOfLife.h"
 }
@@ -21,10 +23,10 @@ __device__ char nextState(char slice[9])
     if (slice[4] == BLUE_ALIVE)
         return BLUE_DYING;
     
-    int i, red, green, blue;
+    int red, green, blue;
     red = green = blue = 0;
 
-    for (i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++)
     {
         if (i == 4)
             continue;
@@ -51,10 +53,10 @@ __device__ char nextState(char slice[9])
 
 __global__ void nextGeneration(char *oldBoard, char *newBoard)
 {
-    int i, x, y, left, right, up, down, stride = blockDim.x * gridDim.x;
+    int x, y, left, right, up, down, stride = blockDim.x * gridDim.x;
     char slice[9];
 
-    for (i = blockIdx.x * blockDim.x + threadIdx.x; i < WIDTH * HEIGHT; i += stride)
+    for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < WIDTH * HEIGHT; i += stride)
     {
         x = i % WIDTH;
         y = i - x;
@@ -78,10 +80,8 @@ __global__ void nextGeneration(char *oldBoard, char *newBoard)
 }
 
 void printBoard(char *board) {
-    int i, j;
-
-    for (i = 0; i < 16; i++) {
-        for (j = 0; j < 16; j++) {
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 16; j++) {
             switch(board[i * WIDTH + j])
             {
                 case RED_ALIVE: cout << "R"; break;
@@ -91,6 +91,7 @@ void printBoard(char *board) {
                 case BLUE_ALIVE: cout << "B"; break;
                 case BLUE_DYING: cout << "b"; break;
                 case DEAD: cout << " "; break;
+                default: cout << "X"; break;
             }
         }
         cout << endl;
@@ -98,18 +99,48 @@ void printBoard(char *board) {
     cout << endl;
 }
 
+__global__ void initRand(curandState *state, unsigned long seed) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    curand_init(seed, idx, 0, &state[idx]);
+}
+
+__global__ void cudaInitiateRandomBoard(curandState *globalState, char *board) {
+    int stride = blockDim.x * gridDim.x, idx = blockIdx.x * blockDim.x + threadIdx.x;
+    float random;
+    curandState localState;
+
+    for (int i = idx; i < WIDTH * HEIGHT; i += stride)
+    {
+        localState = globalState[idx % (blockDim.x * blockDim.x)];
+        random = curand_uniform(&(localState));
+        if (random <= 0.0833)
+            board[i] = RED_ALIVE;
+        else if (random <= 0.1666)
+            board[i] = GREEN_ALIVE;
+        else if (random <= 0.2500)
+            board[i] = BLUE_ALIVE;
+        else
+            board[i] = DEAD;
+        globalState[idx % (blockDim.x * blockDim.x)] = localState;
+    }
+}
+
 int main (void) {
     char *oldBoard, *newBoard;
-    cudaMallocManaged(&oldBoard, WIDTH * HEIGHT * sizeof(char));
-    cudaMallocManaged(&newBoard, WIDTH * HEIGHT * sizeof(char));
-
-    seedRandom();
-    initiateRandomBoardP(oldBoard);
-
-    printBoard(oldBoard);
-
+    curandState *devStates;
     int blockSize = 256;
     int numBlocks = (WIDTH * HEIGHT + blockSize - 1) / blockSize;
+
+    cudaMalloc(&devStates, blockSize * blockSize * sizeof(curandState));
+    cudaMallocManaged(&oldBoard, WIDTH * HEIGHT * sizeof(char));
+    cudaMallocManaged(&newBoard, WIDTH * HEIGHT * sizeof(char));
+    cudaDeviceSynchronize();
+
+    initRand<<<blockSize, blockSize>>>(devStates, time(NULL));
+    cudaInitiateRandomBoard<<<numBlocks, blockSize>>>(devStates, oldBoard);
+    cudaDeviceSynchronize();
+
+    printBoard(oldBoard);
 
     nextGeneration<<<numBlocks, blockSize>>>(oldBoard, newBoard);
     cudaDeviceSynchronize();
