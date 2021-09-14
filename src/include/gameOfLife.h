@@ -16,7 +16,6 @@
 
 void initiateRandomBoard(char[HEIGHT][WIDTH]);
 void initiateRandomBoardP(char *);
-void displayBoard(char[HEIGHT][WIDTH]);
 void seedRandom();
 
 #endif

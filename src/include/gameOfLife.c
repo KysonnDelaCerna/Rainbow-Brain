@@ -68,29 +68,6 @@ void initiateRandomBoardP(char *board)
     }
 }
 
-void displayBoard(char board[HEIGHT][WIDTH])
-{
-    int i, j;
-
-    for (i = 0; i < HEIGHT; i++)
-    {
-        for (j = 0; j < WIDTH; j++)
-        {
-            switch(board[i][j])
-            {
-                case RED_ALIVE: printf("R"); break;
-                case GREEN_ALIVE: printf("G"); break;
-                case BLUE_ALIVE: printf("B"); break;
-                case RED_DYING: printf("r"); break;
-                case GREEN_DYING: printf("g"); break;
-                case BLUE_DYING: printf("b"); break;
-                case DEAD: printf(" "); break;
-            }
-        }
-        printf("\n");
-    }
-}
-
 void seedRandom()
 {
     srand(time(NULL));
