@@ -4,6 +4,8 @@
 #define WIDTH 4096
 #define HEIGHT 4096
 
+#define N_STATES 7
+
 #define RED_ALIVE 6
 #define RED_DYING 5
 #define GREEN_ALIVE 4

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <windowsx.h>
 #include "include/gameOfLife.h"
 #include "include/screen.h"
 
@@ -88,63 +89,118 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             return 0;
 
         case WM_PAINT:
+        {
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+
+            int i, j;
+            RECT rc;
+            HBRUSH RED_BRUSH, DARK_RED_BRUSH, GREEN_BRUSH, DARK_GREEN_BRUSH, BLUE_BRUSH, DARK_BLUE_BRUSH, DEAD_BRUSH;
+            RED_BRUSH           = CreateSolidBrush(RED);
+            DARK_RED_BRUSH      = CreateSolidBrush(DARK_RED);
+            GREEN_BRUSH         = CreateSolidBrush(GREEN);
+            DARK_GREEN_BRUSH    = CreateSolidBrush(DARK_GREEN);
+            BLUE_BRUSH          = CreateSolidBrush(BLUE);
+            DARK_BLUE_BRUSH     = CreateSolidBrush(DARK_BLUE);
+            DEAD_BRUSH          = CreateSolidBrush(BLACK);
+
+            for (i = 0; i < CELLS_Y; i++)
             {
-                PAINTSTRUCT ps;
-                HDC hdc = BeginPaint(hwnd, &ps);
-
-                int i, j;
-                RECT rc;
-                HBRUSH RED_BRUSH, DARK_RED_BRUSH, GREEN_BRUSH, DARK_GREEN_BRUSH, BLUE_BRUSH, DARK_BLUE_BRUSH, DEAD_BRUSH;
-                RED_BRUSH           = CreateSolidBrush(RED);
-                DARK_RED_BRUSH      = CreateSolidBrush(DARK_RED);
-                GREEN_BRUSH         = CreateSolidBrush(GREEN);
-                DARK_GREEN_BRUSH    = CreateSolidBrush(DARK_GREEN);
-                BLUE_BRUSH          = CreateSolidBrush(BLUE);
-                DARK_BLUE_BRUSH     = CreateSolidBrush(DARK_BLUE);
-                DEAD_BRUSH          = CreateSolidBrush(BLACK);
-
-                for (i = 0; i < CELLS_Y; i++)
+                for (j = 0; j < CELLS_X; j++)
                 {
-                    for (j = 0; j < CELLS_X; j++)
+                    rc.left   = j       * CELL_SIZE;
+                    rc.right  = (j + 1) * CELL_SIZE;
+                    rc.top    = i       * CELL_SIZE;
+                    rc.bottom = (i + 1) * CELL_SIZE;
+
+                    switch(oldBoard[mod(y + i, HEIGHT)][mod(x + j, WIDTH)])
                     {
-                        rc.left   = j       * CELL_SIZE;
-                        rc.right  = (j + 1) * CELL_SIZE;
-                        rc.top    = i       * CELL_SIZE;
-                        rc.bottom = (i + 1) * CELL_SIZE;
+                        case RED_ALIVE:     FillRect(hdc, &rc, RED_BRUSH); break;
+                        case RED_DYING:     FillRect(hdc, &rc, DARK_RED_BRUSH); break;
+                        case GREEN_ALIVE:   FillRect(hdc, &rc, GREEN_BRUSH); break;
+                        case GREEN_DYING:   FillRect(hdc, &rc, DARK_GREEN_BRUSH); break;
+                        case BLUE_ALIVE:    FillRect(hdc, &rc, BLUE_BRUSH); break;
+                        case BLUE_DYING:    FillRect(hdc, &rc, DARK_BLUE_BRUSH); break;
+                        case DEAD:          FillRect(hdc, &rc, DEAD_BRUSH); break;
+                    }
 
-                        switch(oldBoard[mod(y + i, HEIGHT)][mod(x + j, WIDTH)])
-                        {
-                            case RED_ALIVE:     FillRect(hdc, &rc, RED_BRUSH); break;
-                            case RED_DYING:     FillRect(hdc, &rc, DARK_RED_BRUSH); break;
-                            case GREEN_ALIVE:   FillRect(hdc, &rc, GREEN_BRUSH); break;
-                            case GREEN_DYING:   FillRect(hdc, &rc, DARK_GREEN_BRUSH); break;
-                            case BLUE_ALIVE:    FillRect(hdc, &rc, BLUE_BRUSH); break;
-                            case BLUE_DYING:    FillRect(hdc, &rc, DARK_BLUE_BRUSH); break;
-                            case DEAD:          FillRect(hdc, &rc, DEAD_BRUSH); break;
-                        }
+                    rc.left   = j       * CELL_SIZE + CELL_SIZE / 4;
+                    rc.right  = rc.left + CELL_SIZE / 2;
+                    rc.top    = i       * CELL_SIZE + CELL_SIZE / 4;
+                    rc.bottom = rc.top  + CELL_SIZE / 2;
 
-                        rc.left   = j       * CELL_SIZE + CELL_SIZE / 4;
-                        rc.right  = rc.left + CELL_SIZE / 2;
-                        rc.top    = i       * CELL_SIZE + CELL_SIZE / 4;
-                        rc.bottom = rc.top  + CELL_SIZE / 2;
-
-                        switch(newBoard[mod(y + i, HEIGHT)][mod(x + j, WIDTH)])
-                        {
-                            case RED_ALIVE:     FillRect(hdc, &rc, RED_BRUSH); break;
-                            case RED_DYING:     FillRect(hdc, &rc, DARK_RED_BRUSH); break;
-                            case GREEN_ALIVE:   FillRect(hdc, &rc, GREEN_BRUSH); break;
-                            case GREEN_DYING:   FillRect(hdc, &rc, DARK_GREEN_BRUSH); break;
-                            case BLUE_ALIVE:    FillRect(hdc, &rc, BLUE_BRUSH); break;
-                            case BLUE_DYING:    FillRect(hdc, &rc, DARK_BLUE_BRUSH); break;
-                            case DEAD:          FillRect(hdc, &rc, DEAD_BRUSH); break;
-                        }
+                    switch(newBoard[mod(y + i, HEIGHT)][mod(x + j, WIDTH)])
+                    {
+                        case RED_ALIVE:     FillRect(hdc, &rc, RED_BRUSH); break;
+                        case RED_DYING:     FillRect(hdc, &rc, DARK_RED_BRUSH); break;
+                        case GREEN_ALIVE:   FillRect(hdc, &rc, GREEN_BRUSH); break;
+                        case GREEN_DYING:   FillRect(hdc, &rc, DARK_GREEN_BRUSH); break;
+                        case BLUE_ALIVE:    FillRect(hdc, &rc, BLUE_BRUSH); break;
+                        case BLUE_DYING:    FillRect(hdc, &rc, DARK_BLUE_BRUSH); break;
+                        case DEAD:          FillRect(hdc, &rc, DEAD_BRUSH); break;
                     }
                 }
+            }
 
-                EndPaint(hwnd, &ps);
+            EndPaint(hwnd, &ps);
+            return 0;
+        }
+        case WM_CHAR:
+        {
+            switch(wParam)
+            {
+                case 'n':
+                {
+                    memcpy(oldBoard, newBoard, sizeof(char) * WIDTH * HEIGHT);
+                    nextGeneration(oldBoard, newBoard);
+                    RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+                    break;
+                }
+                case 'r':
+                {
+                    initiateRandomBoard(oldBoard);
+                    nextGeneration(oldBoard, newBoard);
+                    RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+                    break;
+                }
+                case 'w':
+                {
+                    y = mod(y - 1, HEIGHT);
+                    RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+                    break;
+                }
+                case 's':
+                {
+                    y = mod(y + 1, HEIGHT);
+                    RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+                    break;
+                }
+                case 'a':
+                {
+                    x = mod(x - 1, HEIGHT);
+                    RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+                    break;
+                }
+                case 'd':
+                {
+                    x = mod(x + 1, HEIGHT);
+                    RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+                    break;
+                }
             }
             return 0;
+        }
+        case WM_LBUTTONDOWN:
+        {
+            int xClick = GET_X_LPARAM(lParam) / CELL_SIZE;
+            int yClick = GET_Y_LPARAM(lParam) / CELL_SIZE;
 
+            oldBoard[mod(y + yClick, HEIGHT)][mod(x + xClick, WIDTH)] = (oldBoard[mod(y + yClick, HEIGHT)][mod(x + xClick, WIDTH)] + 1) % N_STATES;
+            nextGeneration(oldBoard, newBoard);
+            RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+
+            return 0;
+        }
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
@@ -195,52 +251,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
     MSG msg = { };
     while (GetMessage(&msg, NULL, 0, 0))
     {
-        switch(msg.message)
-        {
-            case WM_CHAR:
-            {
-                switch(msg.wParam)
-                {
-                    case 'n':
-                    {
-                        memcpy(oldBoard, newBoard, sizeof(char) * WIDTH * HEIGHT);
-                        nextGeneration(oldBoard, newBoard);
-                        RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-                        break;
-                    }
-                    case 'w':
-                    {
-                        y--;
-                        RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-                        break;
-                    }
-                    case 's':
-                    {
-                        y++;
-                        RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-                        break;
-                    }
-                    case 'a':
-                    {
-                        x--;
-                        RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-                        break;
-                    }
-                    case 'd':
-                    {
-                        x++;
-                        RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-                        break;
-                    }
-                }
-                break;
-            }
-            default:
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
 
     return 0;
