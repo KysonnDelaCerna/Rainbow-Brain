@@ -107,12 +107,10 @@ __global__ void initRand(curandState *state, unsigned long seed) {
 __global__ void cudaInitiateRandomBoard(curandState *globalState, char *board) {
     int stride = blockDim.x * gridDim.x, idx = blockIdx.x * blockDim.x + threadIdx.x;
     float random;
-    curandState localState;
 
     for (int i = idx; i < WIDTH * HEIGHT; i += stride)
     {
-        localState = globalState[idx % (blockDim.x * blockDim.x)];
-        random = curand_uniform(&(localState));
+        random = curand_uniform(&(globalState[idx % (blockDim.x * blockDim.x)]));
         if (random <= 0.0833)
             board[i] = RED_ALIVE;
         else if (random <= 0.1666)
@@ -121,7 +119,6 @@ __global__ void cudaInitiateRandomBoard(curandState *globalState, char *board) {
             board[i] = BLUE_ALIVE;
         else
             board[i] = DEAD;
-        globalState[idx % (blockDim.x * blockDim.x)] = localState;
     }
 }
 
@@ -131,7 +128,7 @@ int main (void) {
     int blockSize = 256;
     int numBlocks = (WIDTH * HEIGHT + blockSize - 1) / blockSize;
 
-    cudaMalloc(&devStates, blockSize * blockSize * sizeof(curandState));
+    cudaMallocManaged(&devStates, blockSize * blockSize * sizeof(curandState));
     cudaMallocManaged(&oldBoard, WIDTH * HEIGHT * sizeof(char));
     cudaMallocManaged(&newBoard, WIDTH * HEIGHT * sizeof(char));
     cudaDeviceSynchronize();

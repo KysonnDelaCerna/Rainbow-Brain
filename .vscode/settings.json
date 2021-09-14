@@ -9,6 +9,7 @@
         "game.h": "c",
         "cstdlib": "c",
         "iostream": "cpp",
-        "gameoflife.h": "c"
+        "gameoflife.h": "c",
+        "system_error": "cpp"
     }
 }
