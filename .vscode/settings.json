@@ -10,6 +10,8 @@
         "cstdlib": "c",
         "iostream": "cpp",
         "gameoflife.h": "c",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "string.h": "c",
+        "ostream": "c"
     }
 }

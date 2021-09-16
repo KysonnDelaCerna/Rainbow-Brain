@@ -131,7 +131,6 @@ int main (void) {
     cudaMallocManaged(&devStates, blockSize * blockSize * sizeof(curandState));
     cudaMallocManaged(&oldBoard, WIDTH * HEIGHT * sizeof(char));
     cudaMallocManaged(&newBoard, WIDTH * HEIGHT * sizeof(char));
-    cudaDeviceSynchronize();
 
     initRand<<<blockSize, blockSize>>>(devStates, time(NULL));
     cudaInitiateRandomBoard<<<numBlocks, blockSize>>>(devStates, oldBoard);

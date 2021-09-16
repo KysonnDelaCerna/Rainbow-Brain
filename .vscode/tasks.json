@@ -5,16 +5,23 @@
     "echoCommand": true,
     "tasks": [
         {
-            "label": "buildnogui",
+            "label": "buildnoguicuda",
             "command": "nvcc",
-            "args": ["-g", "-o", "build/nogui.exe", "src/nogui.cu", "src/include/gameOfLife.c"],
+            "args": ["-g", "-o", "build/noguicuda.exe", "src/nogui.cu", "src/include/gameOfLife.c"],
             "group": "build",
             "problemMatcher": []
         },
         {
-            "label": "buildgui",
+            "label": "buildguic",
             "command": "gcc",
-            "args": ["-g", "-o", "build/gui.exe", "src/gui.c", "src/include/gameOfLife.c", "-mwindows"],
+            "args": ["-g", "-o", "build/guic.exe", "src/gui.c", "src/include/gameOfLife.c", "-mwindows"],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildnoguic",
+            "command": "gcc",
+            "args": ["-g", "-o", "build/noguic.exe", "src/nogui.c", "src/include/gameOfLife.c"],
             "group": "build",
             "problemMatcher": []
         }
